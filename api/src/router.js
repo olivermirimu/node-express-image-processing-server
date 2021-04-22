@@ -2,8 +2,10 @@
 /* eslint-disable object-curly-spacing */
 const express = require("express");
 const multer = require("multer");
+const path = require("path");
+// eslint-disable-next-line new-cap
 const router = express.Router();
-
+const photoPath = path.resolve(__dirname, "../../client/photo-viewer.html");
 const filename = (request, file, callback) => {
   callback(null, file.originalname);
 };
@@ -29,6 +31,10 @@ router.post("/upload", upload.single("photo"), (req, res) => {
     return res.status(400).json({ error: req.fileValidationError });
   }
   return res.status(201).json({ success: true });
+});
+
+router.get("/photo-viewer", (req, res) => {
+  return res.sendFile(photoPath);
 });
 
 module.exports = router;
