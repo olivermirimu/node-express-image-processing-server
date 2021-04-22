@@ -3,6 +3,7 @@
 const express = require("express");
 const multer = require("multer");
 const path = require("path");
+const imageProcessor = require("./imageProcessor");
 // eslint-disable-next-line new-cap
 const router = express.Router();
 const photoPath = path.resolve(__dirname, "../../client/photo-viewer.html");
@@ -26,11 +27,14 @@ const fileFilter = (request, file, callback) => {
 
 const upload = multer({ fileFilter, storage });
 
-router.post("/upload", upload.single("photo"), (req, res) => {
-  if (req.fileValidationError) {
-    return res.status(400).json({ error: req.fileValidationError });
-  }
-  return res.status(201).json({ success: true });
+router.post("/upload", upload.single("photo"), async (req, res) => {
+  try {
+    await imageProcessor(req.file.filename);
+    if (req.fileValidationError) {
+      return res.status(400).json({ error: req.fileValidationError });
+    }
+    return res.status(201).json({ success: true });
+  } catch (error) {}
 });
 
 router.get("/photo-viewer", (req, res) => {
